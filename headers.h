@@ -5,4 +5,6 @@
 #include <sys/stat.h>
 #include <time.h>
 
+void generatePlayer();
 int rand_lim(int limit);
+void DisplayHelp();

@@ -1,15 +1,21 @@
 #include "headers.h"
 
+int roomNum;
 char mainMenu[256];
 char user[256];
+char input[256];
 typedef struct Character{
   char name[256];
   int atk;
   int def;
   int spd;
+  int hp;
+  int xp;
+  int level;
 } Character;
 
 Character * Player;
+Character * Enemy;
 
 int main(){
   while(1){
@@ -21,11 +27,28 @@ int main(){
       printf("Please enter your Name:\n");
       fgets(user,sizeof(user),stdin);
       strcpy(Player->name,user);
-      Player->atk = rand_lim(15) + 1;
-      Player->def = rand_lim(12) + 6;
-      Player->spd = rand_lim(100) + 6;
+      srand(time(NULL));
       printf("Generating Stats\n");
-      printf("Name: %s\n Attack: %d\n Defense: %d\n Speed: %d\n",Player->name, Player->atk, Player->def, Player->spd);
+      generatePlayer();
+      printf("Name: %s\nAttack: %d\nDefense: %d\nSpeed: %d\nHealth: %d\n",Player->name, Player->atk, Player->def, Player->spd,Player->hp);
+      sleep(3);
+      system("clear");
+      printf("Would You Like to see the Help Page?\n");
+      while(1){
+	fgets(input,sizeof(input),stdin);
+	if(strcmp("Yes\n",input) == 0){
+	  DisplayHelp();
+	  break;
+	}
+	else if(strcmp("No\n",input) == 0){
+	  system("clear");
+	  break;
+	}
+	else{
+	printf("Sorry. I don't understand what you said\n");
+	}
+      }
+      
       break;
     }
     else if(strcmp("Exit\n",mainMenu) == 0){
@@ -33,22 +56,34 @@ int main(){
       break;
     }
     else{
-      printf("Sorry. I do not understand what you said\n");
+      printf("Sorry. I don't understand what you said\n");
     }
   }
   return 1;
+}
+
+void generatePlayer(){
+  Player->atk = rand_lim(12) + 6;
+  Player->def = rand_lim(12) + 6;
+  Player->spd = rand_lim(12) + 6;
+  Player->hp = rand_lim(12) + 6;
+  Player->xp = 0;
+  Player->level = 1;
 }
 
 int rand_lim(int limit) {
     int divisor = RAND_MAX/(limit+1);
     int retval;
 
-    srand(time(NULL));
     retval = rand();
-    printf("%d\n",divisor);
     while(retval >= limit){
-      retval = retval - divisor;
+      retval = retval - limit;
     }
 
     return retval;
+}
+
+void DisplayHelp(){
+  printf("\n COMMANDS AND FUNCTIONS\nPlease type everything with a leading Capital!\nStats - Displays your Attack, Defense, Speed, Current XP\nand XP until next level\nHealth - You current HP\nRoom - Current Room information\nInventory - Display your current Inventory\nHelp - Displays the Help\n");
+  
 }
