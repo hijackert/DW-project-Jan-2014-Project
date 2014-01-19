@@ -9,6 +9,8 @@ void generatePlayer();
 void printStats();
 void generateRoom();
 void interpretGame();
+void battle();
+void levelUp();
 void printRoomInfo();
 void generateEnemy();
 int rand_lim(int limit);

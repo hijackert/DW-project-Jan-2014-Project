@@ -110,12 +110,12 @@ void generateEnemy(){
 }
 
 void printStats(){
-  printf("Name: %s\nAttack: %d\nDefense: %d\nSpeed: %d\nHealth: %d\nLevel : %d\nCurrent XP : %d\n XP until until next level: %d\n",Player->name, Player->atk, Player->def, Player->spd,Player->hp,Player->level,Player->xp,(Player->xpOffset - Player->xp));
+  printf("Name: %s\nAttack: %d\nDefense: %d\nSpeed: %d\nHealth: %d\nLevel : %d\nCurrent XP : %d\nXP until until next level: %d\n",Player->name, Player->atk, Player->def, Player->spd,Player->hp,Player->level,Player->xp,(Player->xpOffset - Player->xp));
   sleep(3);
 }
 
 void DisplayHelp(){
-  printf("\n COMMANDS AND FUNCTIONS\nPlease type everything with a leading Capital!\nStats - Displays your Attack, Defense, Speed, Current XP, XP until next level, and Health - You current HP\nRoom - Current Room information\nInventory - Display your current Inventory\nHelp - Displays the Help\n");
+  printf("\nCOMMANDS AND FUNCTIONS\nPlease type everything with a leading Capital!\nStats - Displays your Attack, Defense, Speed, Current XP, XP until next level, and Health\nRoom - Current Room information\nInventory - Display your current Inventory\nHelp - Displays the Help\nAdvance: Moves you to the next room if it is possible\n");
   sleep(3);
 }
 
@@ -143,6 +143,17 @@ void interpretGame(){
     system("clear");
     printRoomInfo();
   }
+  else if(strcmp(input,"Attack\n") == 0){
+    battle();
+  }
+  else if(strcmp(input,"Advance\n") == 0){
+    if(!roomClear)
+      printf("The room isn't clear yet!\n");
+    else{
+      printf("You move into the next room\n");
+      generateRoom();
+    }
+  }
   else{
     printf("Sorry, I don't understand that\n");
     sleep(1);
@@ -150,4 +161,55 @@ void interpretGame(){
   }
 }
 
+void battle(){
+  if(Enemy->hp <= 0){
+    printf("There is no monster in this room");
+  }
+  else{
+    int dmg;
+    if(Player->spd >= Enemy->spd){
+      dmg = rand_lim(Player->atk) + Player->atk - Enemy->def;
+      printf("You dealt %d Damage to the monster\n", dmg);
+      Enemy->hp = Enemy->hp - dmg;
+      sleep(1);
+      if(Enemy->hp > 0){
+	dmg = rand_lim(Enemy->atk) + Enemy->atk - Player->def;
+	printf("The monster dealt %d damage to you", dmg);
+	Player->hp = Player->hp - dmg;
+      }
+      else{
+	printf("The monster Died!\n");
+	roomClear = 1;
+	Player->xp = Player->xp + roomXp;
+	while(Player->xp > Player->xpOffset){
+	  levelUp();
+	}
+      }
+    }
+    else{
+      dmg = rand_lim(Enemy->atk) + Enemy->atk - Player->def;
+      printf("The monster dealt %d damage to you", dmg);
+      Player->hp = Player->hp - dmg;
+      sleep(1);
+      if(Player->hp > 0){
+	dmg = rand_lim(Player->atk) + Player->atk - Enemy->def;
+	printf("You dealt %d Damage to the monster\n", dmg);
+	Enemy->hp = Enemy->hp - dmg;
+	if(Enemy->hp <= 0){
+	  roomClear = 1;
+	  Player->xp = Player->xp + roomXp;
+	  while(Player->xp > Player->xpOffset){
+	    levelUp();
+	  }
+	}
+      }
+    }
+  }
+}
 
+void levelUp(){
+  Player->level = Player->level + 1;
+  printf("You have leveled up. You are now level %d\n", Player->level);
+  Player->xp = Player->xp - Player->xpOffset;
+  Player->xpOffset = (Player->level * 10);
+}
