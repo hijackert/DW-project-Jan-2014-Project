@@ -6,6 +6,7 @@ int roomXp;
 char mainMenu[256];
 char user[256];
 char input[256];
+char statUp[256];
 typedef struct Character{
   char name[256];
   int atk;
@@ -53,6 +54,7 @@ int main(){
       }
       generateRoom();
       while(Player->hp > 0){
+	system("clear");
 	printf("What would you like to do?\n");
 	fgets(input,sizeof(input), stdin);
 	interpretGame();
@@ -101,10 +103,10 @@ void generateRoom(){
 
 void generateEnemy(){
   Enemy = (Character *)calloc(1, sizeof(Enemy));
-  Enemy->atk = rand_lim(5 + room) + Player->level;
-  Enemy->def = rand_lim(5 + room) + Player->level;
-  Enemy->spd = rand_lim(5 + room) + Player->level;
-  Enemy->hp = rand_lim(5 + room) + Player->level;
+  Enemy->atk = rand_lim(10 + room) + Player->level;
+  Enemy->def = rand_lim(10 + room) + Player->level;
+  Enemy->spd = rand_lim(10 + room) + Player->level;
+  Enemy->hp = rand_lim(10 + room) + Player->level;
   //int temp = rand_lime(2);
   //strcpy(EnemyList[temp],Enemy->name);
 }
@@ -163,22 +165,28 @@ void interpretGame(){
 
 void battle(){
   if(Enemy->hp <= 0){
-    printf("There is no monster in this room");
+    printf("There is no monster in this room\n");
   }
   else{
     int dmg;
     if(Player->spd >= Enemy->spd){
       dmg = rand_lim(Player->atk) + Player->atk - Enemy->def;
+      if(dmg < 0)
+	dmg = 0;
       printf("You dealt %d Damage to the monster\n", dmg);
       Enemy->hp = Enemy->hp - dmg;
       sleep(1);
       if(Enemy->hp > 0){
 	dmg = rand_lim(Enemy->atk) + Enemy->atk - Player->def;
-	printf("The monster dealt %d damage to you", dmg);
+	if(dmg < 0)
+	  dmg = 0;
+	printf("The monster dealt %d damage to you\n", dmg);
+	sleep(1);
 	Player->hp = Player->hp - dmg;
       }
       else{
 	printf("The monster Died!\n");
+	sleep(1);
 	roomClear = 1;
 	Player->xp = Player->xp + roomXp;
 	while(Player->xp > Player->xpOffset){
@@ -188,12 +196,17 @@ void battle(){
     }
     else{
       dmg = rand_lim(Enemy->atk) + Enemy->atk - Player->def;
-      printf("The monster dealt %d damage to you", dmg);
+      if(dmg < 0)
+	dmg = 0;
+      printf("The monster dealt %d damage to you\n", dmg);
       Player->hp = Player->hp - dmg;
       sleep(1);
       if(Player->hp > 0){
 	dmg = rand_lim(Player->atk) + Player->atk - Enemy->def;
+	if(dmg < 0)
+	  dmg = 0;
 	printf("You dealt %d Damage to the monster\n", dmg);
+	sleep(1);
 	Enemy->hp = Enemy->hp - dmg;
 	if(Enemy->hp <= 0){
 	  roomClear = 1;
@@ -208,8 +221,26 @@ void battle(){
 }
 
 void levelUp(){
+  int skillPoints = 3;
   Player->level = Player->level + 1;
   printf("You have leveled up. You are now level %d\n", Player->level);
   Player->xp = Player->xp - Player->xpOffset;
   Player->xpOffset = (Player->level * 10);
+  while(skillPoints > 0){
+    printf("You have %d skill points remaining. What would you like to increase?\n", skillPoints);
+    fgets(statUp,sizeof(statUp), stdin);
+    skillPoints = skillPoints - 1;
+    if(strcmp("Attack\n",statUp) == 0)
+      Player->atk = Player->atk + 1;
+    else if(strcmp("Defense\n",statUp) == 0)
+      Player->def = Player->def + 1;
+    else if(strcmp("Speed\n",statUp) == 0)
+      Player->spd = Player->spd + 1;
+    else if(strcmp("Hp\n",statUp) == 0)
+    Player->hp = Player->hp + 1;
+    else{
+      printf("Sorry, that is not a valid stat.\n");
+      skillPoints = skillPoints + 1;
+    }
+  }
 }
