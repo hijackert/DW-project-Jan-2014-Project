@@ -1,5 +1,8 @@
 #include "headers.h"
 
+char enemyNames[3][256];
+int nameSize = 2;
+
 int room;
 int roomClear;
 int roomXp;
@@ -22,12 +25,13 @@ Character * Player;
 Character * Enemy;
 
 int main(){
+  nameGenerator();
   system("clear");
   while(1){
-    printf("Welcome\n");
+    printf("Welcome to Generic Crawler #545!\nType Play to start playing, or Exit to Quit the game.\n");
     fgets(mainMenu, sizeof(mainMenu), stdin);
     if(strcmp("Play\n", mainMenu) == 0){
-      printf("Game is Go\n");
+      /// printf("Game is Go\n");
       Player = (Character *)calloc(1, sizeof(Character));
       printf("Please enter your Name:\n");
       fgets(user,sizeof(user),stdin);
@@ -59,7 +63,11 @@ int main(){
 	fgets(input,sizeof(input), stdin);
 	interpretGame();
       }
-      break;
+      printf("YOU LOST!\n");
+      printf("Would you like to play again?\n");
+      fgets(input,sizeof(input),stdin);
+      if(strcmp(input,"No\n") == 0)
+	break;
     }
     else if(strcmp("Exit\n",mainMenu) == 0){
       printf("Goodbye\n");
@@ -97,6 +105,7 @@ int rand_lim(int limit) {
 void generateRoom(){
   room = room + 1;
   generateEnemy();
+  printf("There is a %s in this room\n", Enemy->name);
   roomClear= 0;
   roomXp = rand_lim(Player->level) + Player->level + room;
 }
@@ -107,6 +116,8 @@ void generateEnemy(){
   Enemy->def = rand_lim(10 + room) + Player->level;
   Enemy->spd = rand_lim(10 + room) + Player->level;
   Enemy->hp = rand_lim(10 + room) + Player->level;
+  int temp = rand_lim(nameSize);
+  strcpy(Enemy->name,enemyNames[temp]); 
   //int temp = rand_lime(2);
   //strcpy(EnemyList[temp],Enemy->name);
 }
@@ -117,7 +128,7 @@ void printStats(){
 }
 
 void DisplayHelp(){
-  printf("\nCOMMANDS AND FUNCTIONS\nPlease type everything with a leading Capital!\nStats - Displays your Attack, Defense, Speed, Current XP, XP until next level, and Health\nRoom - Current Room information\nInventory - Display your current Inventory\nHelp - Displays the Help\nAdvance: Moves you to the next room if it is possible\n");
+  printf("\nCOMMANDS AND FUNCTIONS\nPlease type everything with a leading Capital!\nStats - Displays your Attack, Defense, Speed, Current XP, XP until next level, and Health\nRoom - Current Room information\nInventory - Display your current Inventory\nHelp - Displays the Help\nAttack - Attacks the monster if there is one in the room\nAdvance: Moves you to the next room if it is possible\n");
   sleep(3);
 }
 
@@ -166,6 +177,7 @@ void interpretGame(){
 void battle(){
   if(Enemy->hp <= 0){
     printf("There is no monster in this room\n");
+    sleep(1);
   }
   else{
     int dmg;
@@ -173,19 +185,19 @@ void battle(){
       dmg = rand_lim(Player->atk) + Player->atk - Enemy->def;
       if(dmg < 0)
 	dmg = 0;
-      printf("You dealt %d Damage to the monster\n", dmg);
+      printf("You dealt %d damage to the %s\n", dmg,Enemy->name);
       Enemy->hp = Enemy->hp - dmg;
       sleep(1);
       if(Enemy->hp > 0){
 	dmg = rand_lim(Enemy->atk) + Enemy->atk - Player->def;
 	if(dmg < 0)
 	  dmg = 0;
-	printf("The monster dealt %d damage to you\n", dmg);
+	printf("The %s dealt %d damage to you\n", Enemy->name, dmg);
 	sleep(1);
 	Player->hp = Player->hp - dmg;
       }
       else{
-	printf("The monster Died!\n");
+	printf("The %s died!\n", Enemy->name);
 	sleep(1);
 	roomClear = 1;
 	Player->xp = Player->xp + roomXp;
@@ -198,17 +210,18 @@ void battle(){
       dmg = rand_lim(Enemy->atk) + Enemy->atk - Player->def;
       if(dmg < 0)
 	dmg = 0;
-      printf("The monster dealt %d damage to you\n", dmg);
+      printf("The %s dealt %d damage to you\n", Enemy->name, dmg);
       Player->hp = Player->hp - dmg;
       sleep(1);
       if(Player->hp > 0){
 	dmg = rand_lim(Player->atk) + Player->atk - Enemy->def;
 	if(dmg < 0)
 	  dmg = 0;
-	printf("You dealt %d Damage to the monster\n", dmg);
+	printf("You dealt %d damage to the %s\n", dmg, Enemy->name);
 	sleep(1);
 	Enemy->hp = Enemy->hp - dmg;
 	if(Enemy->hp <= 0){
+	  printf("The %s  died!\n", Enemy->name);
 	  roomClear = 1;
 	  Player->xp = Player->xp + roomXp;
 	  while(Player->xp > Player->xpOffset){
@@ -243,4 +256,10 @@ void levelUp(){
       skillPoints = skillPoints + 1;
     }
   }
+}
+
+void nameGenerator(){
+  strcpy(enemyNames[0],"Giant");
+  strcpy(enemyNames[1],"Rat");
+  strcpy(enemyNames[2],"Skeleton");
 }

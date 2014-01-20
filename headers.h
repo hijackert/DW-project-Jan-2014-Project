@@ -15,3 +15,4 @@ void printRoomInfo();
 void generateEnemy();
 int rand_lim(int limit);
 void DisplayHelp();
+void nameGenerator();
