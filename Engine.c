@@ -64,10 +64,7 @@ int main(){
 	interpretGame();
       }
       printf("YOU LOST!\n");
-      printf("Would you like to play again?\n");
-      fgets(input,sizeof(input),stdin);
-      if(strcmp(input,"No\n") == 0)
-	break;
+      sleep(2);
     }
     else if(strcmp("Exit\n",mainMenu) == 0){
       printf("Goodbye\n");
