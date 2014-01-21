@@ -36,32 +36,45 @@ int main(){
     fgets(mainMenu, sizeof(mainMenu), stdin);
     if(strcmp("Play\n", mainMenu) == 0){
       /// printf("Game is Go\n");
-      Player = (Character *)calloc(1, sizeof(Character));
-      printf("Please enter your Name:\n");
-      fgets(user,sizeof(user),stdin);
-      strcpy(Player->name,user);
-      srand(time(NULL));
-      printf("Generating Stats\n");
-      generatePlayer();
-      printStats();
-      system("clear");
-      printf("Would You Like to see the Help Page?\n");
-      while(1){
-	fgets(input,sizeof(input),stdin);
-	if(strcasecmp("Yes\n",input) == 0){
-	  DisplayHelp();
+      printf("Load Game?\n");
+      fgets(input,sizeof(input), stdin);
+      int bob = 2;
+      if(strcasecmp(input,"Yes\n") == 0)
+	bob = 1;
+      switch(bob){
+      case 1:
+	if(!load()){
+	  printf("Test\n");
 	  break;
 	}
-	else if(strcasecmp("No\n",input) == 0){
-	  system("clear");
-	  break;
+      case 2:
+	Player = (Character *)calloc(1, sizeof(Character));
+	printf("Please enter your Name:\n");
+	fgets(user,sizeof(user),stdin);
+	strcpy(Player->name,user);
+	srand(time(NULL));
+	printf("Generating Stats\n");
+	generatePlayer();
+	printStats();
+	system("clear");
+	printf("Would You Like to see the Help Page?\n");
+	while(1){
+	  fgets(input,sizeof(input),stdin);
+	  if(strcasecmp("Yes\n",input) == 0){
+	    DisplayHelp();
+	    break;
+	  }
+	  else if(strcasecmp("No\n",input) == 0){
+	    system("clear");
+	    break;
+	  }
+	  else{
+	    printf("Sorry. I don't understand what you said\n");
+	  }	  
 	}
-	else{
-	printf("Sorry. I don't understand what you said\n");
-	}	  
+	DRoom = calloc(1,sizeof(Room));
+	generateRoom();
       }
-      DRoom = calloc(1,sizeof(Room));
-      generateRoom();
       while(Player->hp > 0){
 	system("clear");
 	printf("What would you like to do?\n");
@@ -287,10 +300,12 @@ void dump(){
 int load(){
   int fd = open("savefile.file", O_RDWR);
   if(fd == -1)
-    return 1;
+    return -1;
+  Player = (Character *) calloc(1, sizeof(Room));
   read(fd, Player, sizeof(Character));
-  DRoom = calloc(1, sizeof(Room));
+  DRoom = (Room *) calloc(1, sizeof(Room));
   read(fd, DRoom, sizeof(Room));
+  Enemy = &(DRoom -> Enemy);
   close(fd);
   return 0;
 }
