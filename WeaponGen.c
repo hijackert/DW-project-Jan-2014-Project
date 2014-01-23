@@ -14,6 +14,9 @@ typedef struct Weapon{
   int attk;
 } Weapon;
 
+int left_to_reseed = 4;
+int seed;
+
 char *wType[] = {"Pointer","Knife","Sword","Spear"};
 double wTypeBase[] = {0,5,10,15};
 char *Part1[] = {"","","Shade's",""};
@@ -27,13 +30,26 @@ Weapon* generateWep(int currlevel);
 
 int main(){
   srand(time(NULL));
-  Weapon * zero = generateWep(20);
-  printf("Weapon created: \n");
-  printf("%s %s %s %s (%d) \n", Part1[zero -> part1], Part2[zero -> part2], wType[zero -> type], Part3[zero -> part3], zero -> lvl);
-  printf("Attack: %d \n", zero->attk);
+  seed = getpid();
+  int x = 10;
+  while(x > 0){
+      Weapon * zero = generateWep(20);
+      printf("Weapon created: \n");
+      printf("%s %s %s %s (%d) \n", Part1[zero -> part1], Part2[zero -> part2], wType[zero -> type], Part3[zero -> part3], zero -> lvl);
+      printf("Attack: %d \n \n", zero->attk);
+      free(zero);
+      x--;
+  }
   return 0;
 }
 int rand_lim(int limit) {
+  if(left_to_reseed){
+    srand(seed);
+    left_to_reseed = (int)((double)12 * ( rand()/(double)RAND_MAX));
+    seed++;
+  }
+  else
+  left_to_reseed--;
   return (int)((double)limit * ( rand()/(double)RAND_MAX));
 }
 Weapon* generateWep(int currlevel){
