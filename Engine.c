@@ -7,22 +7,6 @@ char mainMenu[256];
 char user[256];
 char input[256];
 char statUp[256];
-typedef struct Character{
-  char name[256];
-  int atk;
-  int def;
-  int spd;
-  int hp;
-  int xp;
-  int level;
-  int xpOffset;
-} Character;
-typedef struct Room{
-  Character Enemy;
-  int room;
-  int roomClear;
-  int roomXp;
-} Room;
 
 Character * Player;
 Character * Enemy;
@@ -34,7 +18,7 @@ int main(){
   while(1){
     printf("Welcome to Generic Crawler #545!\nType Play to start playing, or Exit to Quit the game.\n");
     fgets(mainMenu, sizeof(mainMenu), stdin);
-    if(strcmp("Play\n", mainMenu) == 0){
+    if(strcasecmp("Play\n", mainMenu) == 0){
       /// printf("Game is Go\n");
       printf("Load Game?\n");
       fgets(input,sizeof(input), stdin);
@@ -84,9 +68,12 @@ int main(){
       printf("YOU LOST!\n");
       sleep(2);
     }
-    else if(strcmp("Exit\n",mainMenu) == 0){
+    else if(strcasecmp("Exit\n",mainMenu) == 0){
       printf("Goodbye\n");
       break;
+    }
+    else if(strcasecmp("What What?\n",mainMenu) == 0){
+      printf("NO. WE ARE NOT DOING THAT!\n");
     }
     else{
       printf("Sorry. I don't understand what you said\n");
@@ -248,6 +235,7 @@ void battle(){
 	Enemy->hp = Enemy->hp - dmg;
 	if(Enemy->hp <= 0){
 	  printf("The %s  died!\n", Enemy->name);
+	  sleep(1);
 	  DRoom -> roomClear = 1;
 	  Player->xp = Player->xp + roomXp;
 	  while(Player->xp > Player->xpOffset){
