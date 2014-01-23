@@ -20,3 +20,20 @@ void DisplayHelp();
 void nameGenerator();
 void dump();
 int load();
+
+typedef struct Character{
+  char name[256];
+  int atk;
+  int def;
+  int spd;
+  int hp;
+  int xp;
+  int level;
+  int xpOffset;
+} Character;
+typedef struct Room{
+  Character Enemy;
+  int room;
+  int roomClear;
+  int roomXp;
+} Room;
