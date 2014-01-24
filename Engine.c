@@ -12,8 +12,13 @@ Character * Player;
 Character * Enemy;
 Room * DRoom;
 
+int left_to_reseed = 4;
+int seed;
+
 int main(){
   nameGenerator();
+  srand(time(NULL));
+  seed = getpid();
   system("clear");
   while(1){
     printf("Welcome to Generic Crawler #545!\nType Play to start playing, or Exit to Quit the game.\n");
@@ -36,7 +41,6 @@ int main(){
 	printf("Please enter your Name:\n");
 	fgets(user,sizeof(user),stdin);
 	strcpy(Player->name,user);
-	srand(time(NULL));
 	printf("Generating Stats\n");
 	generatePlayer();
 	printStats();
@@ -92,7 +96,7 @@ void generatePlayer(){
   Player->xpOffset = 10;
 }
 
-int rand_lim(int limit) {
+/*int rand_lim(int limit) {
     int divisor = RAND_MAX/(limit+1);
     int retval;
 
@@ -102,6 +106,16 @@ int rand_lim(int limit) {
     }
 
     return retval;
+    }*/
+int rand_lim(int limit) {
+  if(left_to_reseed){
+    srand(seed);
+    left_to_reseed = (int)((double)12 * ( rand()/(double)RAND_MAX));
+    seed++;
+  }
+  else
+  left_to_reseed--;
+  return (int)((double)limit * ( rand()/(double)RAND_MAX));
 }
 
 void generateRoom(){
@@ -214,7 +228,7 @@ void battle(){
 	sleep(1);
 	DRoom -> roomClear = 1;
 	Player->xp = Player->xp + roomXp;
-	while(Player->xp > Player->xpOffset){
+	while(Player->xp >= Player->xpOffset){
 	  levelUp();
 	}
       }
@@ -238,7 +252,7 @@ void battle(){
 	  sleep(1);
 	  DRoom -> roomClear = 1;
 	  Player->xp = Player->xp + roomXp;
-	  while(Player->xp > Player->xpOffset){
+	  while(Player->xp >= Player->xpOffset){
 	    levelUp();
 	  }
 	}
