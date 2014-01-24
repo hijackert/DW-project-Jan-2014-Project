@@ -86,15 +86,7 @@ int main(){
   return 1;
 }
 
-void generatePlayer(){
-  Player->atk = rand_lim(12) + 6;
-  Player->def = rand_lim(12) + 6;
-  Player->spd = rand_lim(12) + 6;
-  Player->hp = rand_lim(12) + 6;
-  Player->xp = 0;
-  Player->level = 1;
-  Player->xpOffset = 10;
-}
+//Utilities-----------------------------------------------------------------------------------------Utilities
 
 /*int rand_lim(int limit) {
     int divisor = RAND_MAX/(limit+1);
@@ -116,6 +108,24 @@ int rand_lim(int limit) {
   else
   left_to_reseed--;
   return (int)((double)limit * ( rand()/(double)RAND_MAX));
+}
+
+//Generation-----------------------------------------------------------------------------------------Generation
+
+void generatePlayer(){
+  Player->atk = rand_lim(12) + 6;
+  Player->def = rand_lim(12) + 6;
+  Player->spd = rand_lim(12) + 6;
+  Player->hp = rand_lim(12) + 6;
+  Player->xp = 0;
+  Player->level = 1;
+  Player->xpOffset = 10;
+}
+
+void nameGenerator(){
+  strcpy(enemyNames[0],"Giant");
+  strcpy(enemyNames[1],"Rat");
+  strcpy(enemyNames[2],"Skeleton");
 }
 
 void generateRoom(){
@@ -140,6 +150,8 @@ void generateEnemy(){
   //strcpy(EnemyList[temp],Enemy->name);
 }
 
+//Print Outputs---------------------------------------------------------------------------------Print Outputs
+
 void printStats(){
   printf("Name: %s\nAttack: %d\nDefense: %d\nSpeed: %d\nHealth: %d\nLevel : %d\nCurrent XP : %d\nXP until until next level: %d\n",Player->name, Player->atk, Player->def, Player->spd,Player->hp,Player->level,Player->xp,(Player->xpOffset - Player->xp));
   printf("\n Press enter to continue \n");
@@ -162,6 +174,8 @@ void printRoomInfo(){
   }
   sleep(2);
 }
+
+//Game functions------------------------------------------------------------------------------------Game Functions
 
 void interpretGame(){
   if(strcasecmp(input,"Help\n") == 0){
@@ -286,11 +300,7 @@ void levelUp(){
   }
 }
 
-void nameGenerator(){
-  strcpy(enemyNames[0],"Giant");
-  strcpy(enemyNames[1],"Rat");
-  strcpy(enemyNames[2],"Skeleton");
-}
+
 
 void dump(){
   int fd = open("savefile.file", O_RDWR | O_CREAT, 0666);
