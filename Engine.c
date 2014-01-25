@@ -196,6 +196,15 @@ void interpretGame(){
   else if(strcasecmp(input,"Attack\n") == 0){
     battle();
   }
+  else if(strcasecmp(input,"down foreward low punch\n") == 0){
+    printf("Hadoken \n");
+    sleep(1);
+    if(DRoom->roomClear)
+      printf("A blue orb comes out of your hands and hits the wall\n");
+    else
+      printf("%s: ... \n", Enemy->name);
+    sleep(1);
+  }
   else if(strcasecmp(input,"Advance\n") == 0){
     if(!DRoom -> roomClear){
       printf("The room isn't clear yet!\n");
