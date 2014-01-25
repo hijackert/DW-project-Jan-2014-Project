@@ -65,6 +65,9 @@ int main(){
       }
       while(Player->hp > 0){
 	system("clear");
+	printf("Your life: %d \n", Player->hp);
+	if(!DRoom->roomClear)
+	  printf("There is a %s in this room\n", Enemy->name);
 	printf("What would you like to do?\n");
 	fgets(input,sizeof(input), stdin);
 	interpretGame();
@@ -282,17 +285,22 @@ void levelUp(){
   Player->xp = Player->xp - Player->xpOffset;
   Player->xpOffset = (Player->level * 10);
   while(skillPoints > 0){
+    printf("Attack: %d \n",  Player->atk);
+    printf("Defense: %d \n",Player->def);
+    printf("Speed: %d \n",Player->spd);
+    printf("Hp: %d \n", Player->hp);
     printf("You have %d skill points remaining. What would you like to increase?\n", skillPoints);
     fgets(statUp,sizeof(statUp), stdin);
+    system("clear");
     skillPoints = skillPoints - 1;
-    if(strcmp("Attack\n",statUp) == 0)
+    if(strcasecmp("Attack\n",statUp) == 0)
       Player->atk = Player->atk + 1;
-    else if(strcmp("Defense\n",statUp) == 0)
+    else if(strcasecmp("Defense\n",statUp) == 0)
       Player->def = Player->def + 1;
-    else if(strcmp("Speed\n",statUp) == 0)
+    else if(strcasecmp("Speed\n",statUp) == 0)
       Player->spd = Player->spd + 1;
-    else if(strcmp("Hp\n",statUp) == 0)
-    Player->hp = Player->hp + 1;
+    else if(strcasecmp("Hp\n",statUp) == 0)
+      Player->hp = Player->hp + 1;
     else{
       printf("Sorry, that is not a valid stat.\n");
       skillPoints = skillPoints + 1;
