@@ -20,20 +20,42 @@ void DisplayHelp();
 void nameGenerator();
 void dump();
 int load();
+void pickUpLoot();
 
+typedef struct Weapon{
+  int type;
+  int part1;
+  int part2;
+  int part3;
+  int lvl;
+  int attk;
+} Weapon;
 typedef struct Character{
   char name[256];
   int atk;
   int def;
   int spd;
   int hp;
+  int maxHp;
   int xp;
   int level;
   int xpOffset;
+  int weaponNum;
+  Weapon * slot1;
+  Weapon * slot2;
 } Character;
 typedef struct Room{
   Character Enemy;
   int room;
   int roomClear;
   int roomXp;
+  Weapon * loot;
 } Room;
+
+#define MAX_WTYPES 4
+#define MAX_PART1 4
+#define MAX_PART2 4
+#define MAX_PART3 4
+
+
+Weapon* generateWep(int currlevel);

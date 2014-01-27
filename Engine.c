@@ -15,8 +15,18 @@ Room * DRoom;
 int left_to_reseed = 4;
 int seed;
 
+char *wType[] = {"Pointer","Knife","Sword","Spear"};
+double wTypeBase[] = {0,5,10,15};
+char *Part1[] = {"","","Shade's",""};
+double Part1x[] = {1,1,1.5,1};
+char *Part2[] = {"Null","Evil","","Dull","Broken"};
+double Part2x[] = {1,1.5,.5,.25};
+char *Part3[] = {"","of Doom","",""};
+double Part3x[] = {1,1,1.75,1};
+
 int main(){
   nameGenerator();
+  //inventory = (Weapon)calloc(1,sizeof(Weapon));
   srand(time(NULL));
   seed = getpid();
   system("clear");
@@ -120,9 +130,13 @@ void generatePlayer(){
   Player->def = rand_lim(12) + 6;
   Player->spd = rand_lim(12) + 6;
   Player->hp = rand_lim(12) + 6;
+  Player->maxHp = Player->hp;
   Player->xp = 0;
   Player->level = 1;
   Player->xpOffset = 10;
+  Player->weaponNum = 0;
+  Player->slot1 = (Weapon *)calloc(1,sizeof(Weapon));
+  Player->slot2 = (Weapon *)calloc(1,sizeof(Weapon));
 }
 
 void nameGenerator(){
@@ -138,6 +152,7 @@ void generateRoom(){
   printf("There is a %s in this room\n", Enemy->name);
   DRoom -> roomClear= 0;
   DRoom -> roomXp = rand_lim(Player->level) + Player->level + room;
+  generateWep(Player->level);
 }
 
 void generateEnemy(){
@@ -151,6 +166,17 @@ void generateEnemy(){
   Enemy = &(DRoom -> Enemy);
   //int temp = rand_lime(2);
   //strcpy(EnemyList[temp],Enemy->name);
+}
+
+Weapon* generateWep(int currlevel){
+  DRoom->loot = (Weapon *) calloc(1,sizeof(Weapon));
+  DRoom->loot->type = rand_lim(MAX_WTYPES);
+  DRoom->loot->part1 = rand_lim(MAX_PART1);
+  DRoom->loot->part2 = rand_lim(MAX_PART2);
+  DRoom->loot->part3 = rand_lim(MAX_PART3);
+  DRoom->loot->lvl = rand_lim(currlevel) - rand_lim(currlevel/4) + currlevel/4;
+  DRoom->loot->attk = (int) (wTypeBase[DRoom->loot->type] * Part1x[DRoom->loot->part1]*Part2x[DRoom->loot->part2]*Part3x[DRoom->loot->part3]) * DRoom->loot->lvl/( Part1x[DRoom->loot->part1]+Part2x[DRoom->loot->part2]+Part3x[DRoom->loot->part3]);
+  return DRoom->loot;
 }
 
 //Print Outputs---------------------------------------------------------------------------------Print Outputs
@@ -219,6 +245,20 @@ void interpretGame(){
     dump();
     printf("Game saved\n");
   }
+  else if(strcasecmp(input,"Inventory\n") == 0){
+    if(Player->weaponNum == 0){
+	printf("You have no weapons!\n");
+	getchar();
+    }
+    else if(Player->weaponNum == 1){
+	printf("Your weapons give you a +%d bonus to attack.\n",Player->slot1->attk);
+	getchar();
+    }
+    else if(Player->weaponNum == 2){
+      printf("Your weapons give you a +%d bonus to attack.\n",Player->slot1->attk + Player->slot2->attk);
+      getchar();
+    }
+  }
   else{
     printf("Sorry, I don't understand that\n");
     sleep(1);
@@ -253,6 +293,7 @@ void battle(){
 	printf("The %s died!\n", Enemy->name);
 	sleep(1);
 	DRoom -> roomClear = 1;
+	pickUpLoot();
 	Player->xp = Player->xp + roomXp;
 	while(Player->xp >= Player->xpOffset){
 	  levelUp();
@@ -277,6 +318,7 @@ void battle(){
 	  printf("The %s  died!\n", Enemy->name);
 	  sleep(1);
 	  DRoom -> roomClear = 1;
+	  pickUpLoot();
 	  Player->xp = Player->xp + roomXp;
 	  while(Player->xp >= Player->xpOffset){
 	    levelUp();
@@ -288,6 +330,7 @@ void battle(){
 }
 
 void levelUp(){
+  Player->hp = Player->maxHp;
   int skillPoints = 3;
   Player->level = Player->level + 1;
   printf("You have leveled up. You are now level %d\n", Player->level);
@@ -308,8 +351,10 @@ void levelUp(){
       Player->def = Player->def + 1;
     else if(strcasecmp("Speed\n",statUp) == 0)
       Player->spd = Player->spd + 1;
-    else if(strcasecmp("Hp\n",statUp) == 0)
+    else if(strcasecmp("Hp\n",statUp) == 0){
+      Player->maxHp = Player->maxHp + 1;
       Player->hp = Player->hp + 1;
+    }
     else{
       printf("Sorry, that is not a valid stat.\n");
       skillPoints = skillPoints + 1;
@@ -317,6 +362,52 @@ void levelUp(){
   }
 }
 
+void pickUpLoot(){
+  printf("You found the %s %s %s %s! (%d)\n", Part1[DRoom->loot -> part1], Part2[DRoom->loot -> part2], wType[DRoom-> loot-> type], Part3[DRoom ->loot-> part3], DRoom->loot -> lvl);
+  sleep(1);
+  if(Player->weaponNum == 0){
+     printf("You picked up the %s %s %s %s! (%d)\n", Part1[DRoom->loot -> part1], Part2[DRoom->loot -> part2], wType[DRoom-> loot-> type],Part3[DRoom->loot-> part3], DRoom->loot -> lvl);
+     Player->slot1 = DRoom->loot;
+     Player->weaponNum = 1;
+     Player->atk = Player->atk + Player->slot1->attk;
+  }
+  else if(Player->weaponNum == 1){
+     printf("You picked up the %s %s %s %s! (%d)\n", Part1[DRoom->loot->part1], Part2[DRoom->loot->part2], wType[DRoom-> loot-> type], Part3[DRoom->loot-> part3], DRoom->loot -> lvl);
+     Player->slot2 = DRoom->loot;
+     Player->atk = Player->atk + Player->slot2->attk;
+     Player->weaponNum = 2;
+  }
+  else{
+    while(1){
+      printf("Your inventory is full. Would you like to discard a Weapon?\n");
+      printf("Your slot 1 weapon gives you +%d to attack\n",Player->slot1->attk);
+      printf("Your slot 2 weapon gives you +%d to attack\n",Player->slot2->attk);
+      printf("The loot weapon would give  you +%d to attack\n",DRoom->loot->attk);
+      fgets(input,sizeof(input),stdin);
+      if(strcasecmp(input,"Yes\n") == 0){
+	printf("Which slot would you like to discard?\n");
+	fgets(input,sizeof(input),stdin);
+	if(strcasecmp("1\n",input) == 0 || strcasecmp("Slot 1\n",input) == 0){
+	  Player->atk = Player->atk - Player->slot1->attk;
+	  Player->slot1 = DRoom->loot;
+	  Player->atk = Player->atk + Player->slot1->attk;
+	  break;
+	}
+	else if(strcasecmp("2\n",input) == 0 || strcasecmp("Slot 2\n",input) == 0){
+	  Player->atk = Player->atk - Player->slot2->attk;
+	  Player->slot2 = DRoom->loot;
+	  Player->atk = Player->atk + Player->slot2->attk;
+	  break;
+	}
+	else{
+	  printf("Sorry, I did not understand what you said\n");
+	}
+      }
+      else
+	break;
+    }
+  }
+}
 
 
 void dump(){
