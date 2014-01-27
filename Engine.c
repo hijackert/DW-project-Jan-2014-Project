@@ -7,34 +7,23 @@ char mainMenu[256];
 char user[256];
 char input[256];
 char statUp[256];
-typedef struct Character{
-  char name[256];
-  int atk;
-  int def;
-  int spd;
-  int hp;
-  int xp;
-  int level;
-  int xpOffset;
-} Character;
-typedef struct Room{
-  Character Enemy;
-  int room;
-  int roomClear;
-  int roomXp;
-} Room;
 
 Character * Player;
 Character * Enemy;
 Room * DRoom;
 
+int left_to_reseed = 4;
+int seed;
+
 int main(){
   nameGenerator();
+  srand(time(NULL));
+  seed = getpid();
   system("clear");
   while(1){
     printf("Welcome to Generic Crawler #545!\nType Play to start playing, or Exit to Quit the game.\n");
     fgets(mainMenu, sizeof(mainMenu), stdin);
-    if(strcmp("Play\n", mainMenu) == 0){
+    if(strcasecmp("Play\n", mainMenu) == 0){
       /// printf("Game is Go\n");
       printf("Load Game?\n");
       fgets(input,sizeof(input), stdin);
@@ -52,7 +41,6 @@ int main(){
 	printf("Please enter your Name:\n");
 	fgets(user,sizeof(user),stdin);
 	strcpy(Player->name,user);
-	srand(time(NULL));
 	printf("Generating Stats\n");
 	generatePlayer();
 	printStats();
@@ -77,6 +65,9 @@ int main(){
       }
       while(Player->hp > 0){
 	system("clear");
+	printf("Your life: %d \n", Player->hp);
+	if(!DRoom->roomClear)
+	  printf("There is a %s in this room\n", Enemy->name);
 	printf("What would you like to do?\n");
 	fgets(input,sizeof(input), stdin);
 	interpretGame();
@@ -84,9 +75,12 @@ int main(){
       printf("YOU LOST!\n");
       sleep(2);
     }
-    else if(strcmp("Exit\n",mainMenu) == 0){
+    else if(strcasecmp("Exit\n",mainMenu) == 0){
       printf("Goodbye\n");
       break;
+    }
+    else if(strcasecmp("What What?\n",mainMenu) == 0){
+      printf("NO. WE ARE NOT DOING THAT!\n");
     }
     else{
       printf("Sorry. I don't understand what you said\n");
@@ -94,6 +88,32 @@ int main(){
   }
   return 1;
 }
+
+//Utilities-----------------------------------------------------------------------------------------Utilities
+
+/*int rand_lim(int limit) {
+    int divisor = RAND_MAX/(limit+1);
+    int retval;
+
+    retval = rand();
+    while(retval >= limit){
+      retval = retval - limit;
+    }
+
+    return retval;
+    }*/
+int rand_lim(int limit) {
+  if(left_to_reseed){
+    srand(seed);
+    left_to_reseed = (int)((double)12 * ( rand()/(double)RAND_MAX));
+    seed++;
+  }
+  else
+  left_to_reseed--;
+  return (int)((double)limit * ( rand()/(double)RAND_MAX));
+}
+
+//Generation-----------------------------------------------------------------------------------------Generation
 
 void generatePlayer(){
   Player->atk = rand_lim(12) + 6;
@@ -105,16 +125,10 @@ void generatePlayer(){
   Player->xpOffset = 10;
 }
 
-int rand_lim(int limit) {
-    int divisor = RAND_MAX/(limit+1);
-    int retval;
-
-    retval = rand();
-    while(retval >= limit){
-      retval = retval - limit;
-    }
-
-    return retval;
+void nameGenerator(){
+  strcpy(enemyNames[0],"Giant");
+  strcpy(enemyNames[1],"Rat");
+  strcpy(enemyNames[2],"Skeleton");
 }
 
 void generateRoom(){
@@ -139,6 +153,8 @@ void generateEnemy(){
   //strcpy(EnemyList[temp],Enemy->name);
 }
 
+//Print Outputs---------------------------------------------------------------------------------Print Outputs
+
 void printStats(){
   printf("Name: %s\nAttack: %d\nDefense: %d\nSpeed: %d\nHealth: %d\nLevel : %d\nCurrent XP : %d\nXP until until next level: %d\n",Player->name, Player->atk, Player->def, Player->spd,Player->hp,Player->level,Player->xp,(Player->xpOffset - Player->xp));
   printf("\n Press enter to continue \n");
@@ -162,6 +178,8 @@ void printRoomInfo(){
   sleep(2);
 }
 
+//Game functions------------------------------------------------------------------------------------Game Functions
+
 void interpretGame(){
   if(strcasecmp(input,"Help\n") == 0){
     system("clear");
@@ -177,6 +195,15 @@ void interpretGame(){
   }
   else if(strcasecmp(input,"Attack\n") == 0){
     battle();
+  }
+  else if(strcasecmp(input,"down foreward low punch\n") == 0){
+    printf("Hadoken \n");
+    sleep(1);
+    if(DRoom->roomClear)
+      printf("A blue orb comes out of your hands and hits the wall\n");
+    else
+      printf("%s: ... \n", Enemy->name);
+    sleep(1);
   }
   else if(strcasecmp(input,"Advance\n") == 0){
     if(!DRoom -> roomClear){
@@ -227,7 +254,7 @@ void battle(){
 	sleep(1);
 	DRoom -> roomClear = 1;
 	Player->xp = Player->xp + roomXp;
-	while(Player->xp > Player->xpOffset){
+	while(Player->xp >= Player->xpOffset){
 	  levelUp();
 	}
       }
@@ -248,9 +275,10 @@ void battle(){
 	Enemy->hp = Enemy->hp - dmg;
 	if(Enemy->hp <= 0){
 	  printf("The %s  died!\n", Enemy->name);
+	  sleep(1);
 	  DRoom -> roomClear = 1;
 	  Player->xp = Player->xp + roomXp;
-	  while(Player->xp > Player->xpOffset){
+	  while(Player->xp >= Player->xpOffset){
 	    levelUp();
 	  }
 	}
@@ -266,17 +294,22 @@ void levelUp(){
   Player->xp = Player->xp - Player->xpOffset;
   Player->xpOffset = (Player->level * 10);
   while(skillPoints > 0){
+    printf("Attack: %d \n",  Player->atk);
+    printf("Defense: %d \n",Player->def);
+    printf("Speed: %d \n",Player->spd);
+    printf("Hp: %d \n", Player->hp);
     printf("You have %d skill points remaining. What would you like to increase?\n", skillPoints);
     fgets(statUp,sizeof(statUp), stdin);
+    system("clear");
     skillPoints = skillPoints - 1;
-    if(strcmp("Attack\n",statUp) == 0)
+    if(strcasecmp("Attack\n",statUp) == 0)
       Player->atk = Player->atk + 1;
-    else if(strcmp("Defense\n",statUp) == 0)
+    else if(strcasecmp("Defense\n",statUp) == 0)
       Player->def = Player->def + 1;
-    else if(strcmp("Speed\n",statUp) == 0)
+    else if(strcasecmp("Speed\n",statUp) == 0)
       Player->spd = Player->spd + 1;
-    else if(strcmp("Hp\n",statUp) == 0)
-    Player->hp = Player->hp + 1;
+    else if(strcasecmp("Hp\n",statUp) == 0)
+      Player->hp = Player->hp + 1;
     else{
       printf("Sorry, that is not a valid stat.\n");
       skillPoints = skillPoints + 1;
@@ -284,11 +317,7 @@ void levelUp(){
   }
 }
 
-void nameGenerator(){
-  strcpy(enemyNames[0],"Giant");
-  strcpy(enemyNames[1],"Rat");
-  strcpy(enemyNames[2],"Skeleton");
-}
+
 
 void dump(){
   int fd = open("savefile.file", O_RDWR | O_CREAT, 0666);
