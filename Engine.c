@@ -29,9 +29,10 @@ int main(){
   //inventory = (Weapon)calloc(1,sizeof(Weapon));
   srand(time(NULL));
   seed = getpid();
-  system("clear");
+  
   while(1){
-    printf("Welcome to Generic Crawler #545!\nType Play to start playing, or Exit to Quit the game.\n");
+    system("clear");
+    printf("Welcome to Generic Crawler #%d!\nType Play to start playing, or Exit to Quit the game.\n",rand_lim(545));
     fgets(mainMenu, sizeof(mainMenu), stdin);
     if(strcasecmp("Play\n", mainMenu) == 0){
       /// printf("Game is Go\n");
@@ -135,8 +136,8 @@ void generatePlayer(){
   Player->level = 1;
   Player->xpOffset = 10;
   Player->weaponNum = 0;
-  Player->slot1 = (Weapon *)calloc(1,sizeof(Weapon));
-  Player->slot2 = (Weapon *)calloc(1,sizeof(Weapon));
+  Player->slot1 = *(Weapon *)calloc(1,sizeof(Weapon));
+  Player->slot2 = *(Weapon *)calloc(1,sizeof(Weapon));
 }
 
 void nameGenerator(){
@@ -168,14 +169,21 @@ void generateEnemy(){
   //strcpy(EnemyList[temp],Enemy->name);
 }
 
-Weapon* generateWep(int currlevel){
-  DRoom->loot = (Weapon *) calloc(1,sizeof(Weapon));
-  DRoom->loot->type = rand_lim(MAX_WTYPES);
-  DRoom->loot->part1 = rand_lim(MAX_PART1);
-  DRoom->loot->part2 = rand_lim(MAX_PART2);
-  DRoom->loot->part3 = rand_lim(MAX_PART3);
-  DRoom->loot->lvl = rand_lim(currlevel) - rand_lim(currlevel/4) + currlevel/4;
-  DRoom->loot->attk = (int) (wTypeBase[DRoom->loot->type] * Part1x[DRoom->loot->part1]*Part2x[DRoom->loot->part2]*Part3x[DRoom->loot->part3]) * DRoom->loot->lvl/( Part1x[DRoom->loot->part1]+Part2x[DRoom->loot->part2]+Part3x[DRoom->loot->part3]);
+Weapon generateWep(int currlevel){
+  DRoom->loot = *(Weapon *) calloc(1,sizeof(Weapon));
+  DRoom->loot.type = rand_lim(MAX_WTYPES);
+  DRoom->loot.part1 = rand_lim(MAX_PART1);
+  DRoom->loot.part2 = rand_lim(MAX_PART2);
+  DRoom->loot.part3 = rand_lim(MAX_PART3);
+  DRoom->loot.lvl = rand_lim(currlevel) - rand_lim(currlevel/4) + currlevel/4 + 1;
+  DRoom->loot.attk = (int) ((wTypeBase[DRoom->loot.type] * 
+			     Part1x[DRoom->loot.part1]*
+			     Part2x[DRoom->loot.part2]*
+			     Part3x[DRoom->loot.part3]) * 
+			     DRoom->loot.lvl/(
+					       Part1x[DRoom->loot.part1]+
+					       Part2x[DRoom->loot.part2]+
+					       Part3x[DRoom->loot.part3]));
   return DRoom->loot;
 }
 
@@ -188,7 +196,7 @@ void printStats(){
 }
 
 void DisplayHelp(){
-  printf("\nCOMMANDS AND FUNCTIONS\nPlease type everything with a leading Capital!\nStats - Displays your Attack, Defense, Speed, Current XP, XP until next level, and Health\nRoom - Current Room information\nInventory - Display your current Inventory\nHelp - Displays the Help\nAttack - Attacks the monster if there is one in the room\nAdvance: Moves you to the next room if it is possible\n");
+  printf("\nCOMMANDS AND FUNCTIONS\nStats - Displays your Attack, Defense, Speed, Current XP, XP until next level, and Health\nRoom - Current Room information\nInventory - Display your current Inventory\nHelp - Displays the Help\nAttack - Attacks the monster if there is one in the room\nAdvance: Moves you to the next room if it is possible\nSave - save the game (note: you may only have one save file)\n");
   printf("\n Press enter to continue \n");
   getchar();
 }
@@ -251,11 +259,11 @@ void interpretGame(){
 	getchar();
     }
     else if(Player->weaponNum == 1){
-	printf("Your weapons give you a +%d bonus to attack.\n",Player->slot1->attk);
+	printf("Your weapons give you a +%d bonus to attack.\n",Player->slot1.attk);
 	getchar();
     }
     else if(Player->weaponNum == 2){
-      printf("Your weapons give you a +%d bonus to attack.\n",Player->slot1->attk + Player->slot2->attk);
+      printf("Your weapons give you a +%d bonus to attack.\n",Player->slot1.attk + Player->slot2.attk);
       getchar();
     }
   }
@@ -330,7 +338,6 @@ void battle(){
 }
 
 void levelUp(){
-  Player->hp = Player->maxHp;
   int skillPoints = 3;
   Player->level = Player->level + 1;
   printf("You have leveled up. You are now level %d\n", Player->level);
@@ -340,7 +347,7 @@ void levelUp(){
     printf("Attack: %d \n",  Player->atk);
     printf("Defense: %d \n",Player->def);
     printf("Speed: %d \n",Player->spd);
-    printf("Hp: %d \n", Player->hp);
+    printf("Hp: %d \n", Player->maxHp);
     printf("You have %d skill points remaining. What would you like to increase?\n", skillPoints);
     fgets(statUp,sizeof(statUp), stdin);
     system("clear");
@@ -351,60 +358,67 @@ void levelUp(){
       Player->def = Player->def + 1;
     else if(strcasecmp("Speed\n",statUp) == 0)
       Player->spd = Player->spd + 1;
-    else if(strcasecmp("Hp\n",statUp) == 0){
+    else if(strcasecmp("Hp\n",statUp) == 0)
       Player->maxHp = Player->maxHp + 1;
-      Player->hp = Player->hp + 1;
-    }
     else{
       printf("Sorry, that is not a valid stat.\n");
       skillPoints = skillPoints + 1;
     }
   }
+  Player->hp = Player->maxHp;
 }
 
 void pickUpLoot(){
-  printf("You found the %s %s %s %s! (%d)\n", Part1[DRoom->loot -> part1], Part2[DRoom->loot -> part2], wType[DRoom-> loot-> type], Part3[DRoom ->loot-> part3], DRoom->loot -> lvl);
+  system("clear");
+  printf("You found the %s %s %s %s! (%d)\n", Part1[DRoom->loot.part1], Part2[DRoom->loot.part2], wType[DRoom-> loot.type], Part3[DRoom ->loot.part3], DRoom->loot.lvl);
   sleep(1);
-  if(Player->weaponNum == 0){
-     printf("You picked up the %s %s %s %s! (%d)\n", Part1[DRoom->loot -> part1], Part2[DRoom->loot -> part2], wType[DRoom-> loot-> type],Part3[DRoom->loot-> part3], DRoom->loot -> lvl);
-     Player->slot1 = DRoom->loot;
-     Player->weaponNum = 1;
-     Player->atk = Player->atk + Player->slot1->attk;
-  }
-  else if(Player->weaponNum == 1){
-     printf("You picked up the %s %s %s %s! (%d)\n", Part1[DRoom->loot->part1], Part2[DRoom->loot->part2], wType[DRoom-> loot-> type], Part3[DRoom->loot-> part3], DRoom->loot -> lvl);
-     Player->slot2 = DRoom->loot;
-     Player->atk = Player->atk + Player->slot2->attk;
-     Player->weaponNum = 2;
+  if (Player->weaponNum < 2){
+    printf("You picked up the %s %s %s %s! (%d)\n", Part1[DRoom->loot.part1], Part2[DRoom->loot.part2], wType[DRoom-> loot.type],Part3[DRoom->loot.part3], DRoom->loot.lvl);
+    if(Player->weaponNum == 0){
+      //free(&Player->slot1);
+      Player->slot1 = DRoom->loot;
+      Player->weaponNum = 1;
+      Player->atk = Player->atk + Player->slot1.attk;
+    }
+    else if(Player->weaponNum == 1){
+      //free(&Player->slot2);
+      Player->slot2 = DRoom->loot;
+      Player->atk = Player->atk + Player->slot2.attk;
+      Player->weaponNum = 2;
+    }
   }
   else{
     while(1){
       printf("Your inventory is full. Would you like to discard a Weapon?\n");
-      printf("Your slot 1 weapon gives you +%d to attack\n",Player->slot1->attk);
-      printf("Your slot 2 weapon gives you +%d to attack\n",Player->slot2->attk);
-      printf("The loot weapon would give  you +%d to attack\n",DRoom->loot->attk);
+      printf("Your slot 1 weapon gives you +%d to attack\n",Player->slot1.attk);
+      printf("Your slot 2 weapon gives you +%d to attack\n",Player->slot2.attk);
+      printf("The loot weapon would give  you +%d to attack\n",DRoom->loot.attk);
       fgets(input,sizeof(input),stdin);
       if(strcasecmp(input,"Yes\n") == 0){
 	printf("Which slot would you like to discard?\n");
 	fgets(input,sizeof(input),stdin);
 	if(strcasecmp("1\n",input) == 0 || strcasecmp("Slot 1\n",input) == 0){
-	  Player->atk = Player->atk - Player->slot1->attk;
+	  Player->atk = Player->atk - Player->slot1.attk;
+	  //free(&Player->slot1);
 	  Player->slot1 = DRoom->loot;
-	  Player->atk = Player->atk + Player->slot1->attk;
+	  Player->atk = Player->atk + Player->slot1.attk;
 	  break;
 	}
 	else if(strcasecmp("2\n",input) == 0 || strcasecmp("Slot 2\n",input) == 0){
-	  Player->atk = Player->atk - Player->slot2->attk;
+	  Player->atk = Player->atk - Player->slot2.attk;
+	  //free(&Player->slot2);
 	  Player->slot2 = DRoom->loot;
-	  Player->atk = Player->atk + Player->slot2->attk;
+	  Player->atk = Player->atk + Player->slot2.attk;
 	  break;
 	}
 	else{
 	  printf("Sorry, I did not understand what you said\n");
 	}
       }
-      else
+      else{
+	//free(&DRoom -> loot);
 	break;
+      }
     }
   }
 }
@@ -421,7 +435,7 @@ int load(){
   int fd = open("savefile.file", O_RDWR);
   if(fd == -1)
     return -1;
-  Player = (Character *) calloc(1, sizeof(Room));
+  Player = (Character *) calloc(1, sizeof(Character));
   read(fd, Player, sizeof(Character));
   DRoom = (Room *) calloc(1, sizeof(Room));
   read(fd, DRoom, sizeof(Room));

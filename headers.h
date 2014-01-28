@@ -41,15 +41,15 @@ typedef struct Character{
   int level;
   int xpOffset;
   int weaponNum;
-  Weapon * slot1;
-  Weapon * slot2;
+  Weapon slot1;
+  Weapon slot2;
 } Character;
 typedef struct Room{
   Character Enemy;
   int room;
   int roomClear;
   int roomXp;
-  Weapon * loot;
+  Weapon loot;
 } Room;
 
 #define MAX_WTYPES 4
@@ -58,4 +58,4 @@ typedef struct Room{
 #define MAX_PART3 4
 
 
-Weapon* generateWep(int currlevel);
+Weapon generateWep(int currlevel);
