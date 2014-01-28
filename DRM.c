@@ -36,10 +36,10 @@ int main(int argc, char **argv) {
   //connect to the server
   int c = connect(socket_id, (struct sockaddr *)&sock, sizeof(sock));
   printf("Game Copy Verified\n");
-
-  execvp("Engine.c", engine);
   
   close(socket_id);
+
+  execvp("Engine.c", engine);
 
   return 0;
 }
