@@ -8,6 +8,20 @@
 #include <netinet/in.h>
 
 
+char * capitalize(char *s) {
+
+  char *p;
+  p = s;
+  
+  while ( *p ) {
+    
+    if ( *p >= 'a' && *p <= 'z' )
+      *p = *p - ('a' - 'A');
+    p = p + 1;
+  }
+  return s;
+}
+
 void subserver( int socket_client ) {
 
     char buffer[256];
@@ -21,11 +35,13 @@ void subserver( int socket_client ) {
       b = read( socket_client, buffer, sizeof(buffer) );
       printf("Received: %s\n", buffer);
       
-      if ( strncmp(buffer, "exit game", sizeof(buffer)) == 0 )
+      if ( strncmp(buffer, "exit", sizeof(buffer)) == 0 )
 	break;
 
-      //Execute game
-      execvp(Engine.c);
+      //processand write back
+      capitalize( buffer );
+
+      write( socket_client, buffer, strlen(buffer));
     }
     
     //close this client connection

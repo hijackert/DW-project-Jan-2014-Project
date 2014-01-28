@@ -37,17 +37,20 @@ int main(int argc, char **argv) {
 
     //do client stuff continuously
     while (1) {
-  
+
+      
+      printf("Enter message: ");
       fgets(buffer, sizeof(buffer), stdin);
       *(strchr(buffer, '\n')) = 0;
 
       b = write( socket_id, buffer, strlen(buffer) + 1 );
 
-      if ( strncmp(buffer, "exit game", sizeof(buffer)) == 0)
+      if ( strncmp(buffer, "exit", sizeof(buffer)) == 0)
 	break;
 
       b = read( socket_id, buffer, strlen(buffer));
-
+      
+      printf("\tReceived: %s\n", buffer);
     }
 
     close(socket_id);
