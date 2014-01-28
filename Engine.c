@@ -1,4 +1,8 @@
 #include "headers.h"
+#define MAX_WTYPES 5
+#define MAX_PART1 5
+#define MAX_PART2 5
+#define MAX_PART3 5
 
 char enemyNames[3][256];
 int nameSize = 2;
@@ -15,14 +19,14 @@ Room * DRoom;
 int left_to_reseed = 4;
 int seed;
 
-char *wType[] = {"Pointer","Knife","Sword","Spear"};
-double wTypeBase[] = {0,5,10,15};
-char *Part1[] = {"","","Shade's",""};
-double Part1x[] = {1,1,1.5,1};
+char *wType[] = {"Pointer","Knife","Sword","Spear","Halberd"};
+double wTypeBase[] = {0,5,10,15,20};
+char *Part1[] = {"","","Shade's","","Beginner's"};
+double Part1x[] = {1,1,1.5,1,.5};
 char *Part2[] = {"Null","Evil","","Dull","Broken"};
 double Part2x[] = {1,1.5,.5,.25};
-char *Part3[] = {"","of Doom","",""};
-double Part3x[] = {1,1,1.75,1};
+char *Part3[] = {"","of Doom","","","of insignifigance"};
+double Part3x[] = {1,1,1.75,1,.25};
 
 int main(){
   nameGenerator();
@@ -92,9 +96,11 @@ int main(){
     }
     else if(strcasecmp("What What?\n",mainMenu) == 0){
       printf("NO. WE ARE NOT DOING THAT!\n");
+      sleep(1);
     }
     else{
       printf("Sorry. I don't understand what you said\n");
+      sleep(2);
     }
   }
   return 1;
@@ -127,17 +133,32 @@ int rand_lim(int limit) {
 //Generation-----------------------------------------------------------------------------------------Generation
 
 void generatePlayer(){
-  Player->atk = rand_lim(12) + 6;
-  Player->def = rand_lim(12) + 6;
-  Player->spd = rand_lim(12) + 6;
-  Player->hp = rand_lim(12) + 6;
-  Player->maxHp = Player->hp;
-  Player->xp = 0;
-  Player->level = 1;
-  Player->xpOffset = 10;
-  Player->weaponNum = 0;
-  Player->slot1 = *(Weapon *)calloc(1,sizeof(Weapon));
-  Player->slot2 = *(Weapon *)calloc(1,sizeof(Weapon));
+  if(strcmp(Player->name,"Lu Bu")){
+    Player->atk = 999;
+    Player->def = 999;
+    Player->spd = 100;
+    Player->hp = 999;
+    Player->maxHp = Player->hp;
+    Player->xp = 0;
+    Player->level = 1;
+    Player->xpOffset = 10;
+    Player->weaponNum = 0;
+    Player->slot1 = *(Weapon *)calloc(1,sizeof(Weapon));
+    Player->slot2 = *(Weapon *)calloc(1,sizeof(Weapon));
+  }
+  else{
+    Player->atk = rand_lim(12) + 6;
+    Player->def = rand_lim(12) + 6;
+    Player->spd = rand_lim(12) + 6;
+    Player->hp = rand_lim(12) + 6;
+    Player->maxHp = Player->hp;
+    Player->xp = 0;
+    Player->level = 1;
+    Player->xpOffset = 10;
+    Player->weaponNum = 0;
+    Player->slot1 = *(Weapon *)calloc(1,sizeof(Weapon));
+    Player->slot2 = *(Weapon *)calloc(1,sizeof(Weapon));
+  }
 }
 
 void nameGenerator(){

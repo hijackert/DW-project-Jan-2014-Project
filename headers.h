@@ -52,10 +52,7 @@ typedef struct Room{
   Weapon loot;
 } Room;
 
-#define MAX_WTYPES 4
-#define MAX_PART1 4
-#define MAX_PART2 4
-#define MAX_PART3 4
+
 
 
 Weapon generateWep(int currlevel);
