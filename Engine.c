@@ -133,7 +133,7 @@ int rand_lim(int limit) {
 //Generation-----------------------------------------------------------------------------------------Generation
 
 void generatePlayer(){
-  if(strcmp(Player->name,"Lu Bu")){
+  if(!strcmp(Player->name,"Lu Bu\n")){
     Player->atk = 999;
     Player->def = 999;
     Player->spd = 100;
