@@ -136,12 +136,12 @@ void generatePlayer(){
   if(!strcmp(Player->name,"Lu Bu\n")){
     Player->atk = 999;
     Player->def = 999;
-    Player->spd = 100;
+    Player->spd = 1;
     Player->hp = 999;
     Player->maxHp = Player->hp;
     Player->xp = 0;
-    Player->level = 1;
-    Player->xpOffset = 10;
+    Player->level = 10;
+    Player->xpOffset = 999;
     Player->weaponNum = 0;
     Player->slot1 = *(Weapon *)calloc(1,sizeof(Weapon));
     Player->slot2 = *(Weapon *)calloc(1,sizeof(Weapon));
@@ -217,7 +217,7 @@ void printStats(){
 }
 
 void DisplayHelp(){
-  printf("\nCOMMANDS AND FUNCTIONS\nStats - Displays your Attack, Defense, Speed, Current XP, XP until next level, and Health\nRoom - Current Room information\nInventory - Display your current Inventory\nHelp - Displays the Help\nAttack - Attacks the monster if there is one in the room\nAdvance: Moves you to the next room if it is possible\nSave - save the game (note: you may only have one save file)\n");
+  printf("\nCOMMANDS AND FUNCTIONS\nStats - Displays your Attack, Defense, Speed, Current XP,\n\t XP until next level, and Health\nRoom - Current Room information\nInventory - Display your current Inventory\nHelp - Displays the Help\nAttack - Attacks the monster if there is one in the room\nAdvance: Moves you to the next room if it is possible\nSave - save the game (note: you may only have one save file)\n");
   printf("\n Press enter to continue \n");
   getchar();
 }
