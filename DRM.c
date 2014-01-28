@@ -13,13 +13,15 @@ int main(int argc, char **argv) {
   int socket_id;
   char buffer[256];
   int i, b;
-  
+  char * engine[2] = {"Engine.c", (char *)0};
+
+
   struct sockaddr_in sock;
 
   //make the server socket for reliable IPv4 traffic 
   socket_id = socket( AF_INET, SOCK_STREAM, 0);
 
-  printf("Soket file descriptor: %d\n", socket_id);
+  // printf("Soket file descriptor: %d\n", socket_id);
 
   //set up the server socket struct
   //Use IPv4 
@@ -33,27 +35,11 @@ int main(int argc, char **argv) {
   
   //connect to the server
   int c = connect(socket_id, (struct sockaddr *)&sock, sizeof(sock));
-  printf("Connect returned: %d\n", c);
+  printf("Game Copy Verified\n");
 
-    //do client stuff continuously
-    while (1) {
+  execvp("Engine.c", engine);
+  
+  close(socket_id);
 
-      
-      printf("Enter message: ");
-      fgets(buffer, sizeof(buffer), stdin);
-      *(strchr(buffer, '\n')) = 0;
-
-      b = write( socket_id, buffer, strlen(buffer) + 1 );
-
-      if ( strncmp(buffer, "exit", sizeof(buffer)) == 0)
-	break;
-
-      b = read( socket_id, buffer, strlen(buffer));
-      
-      printf("\tReceived: %s\n", buffer);
-    }
-
-    close(socket_id);
-
-    return 0;
+  return 0;
 }
