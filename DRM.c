@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
   int socket_id;
   char buffer[256];
   int i, b;
-  char * engine[2] = {"Engine.c", (char *)0};
+  char * engine[2] = {"./execute", (char *)0};
 
 
   struct sockaddr_in sock;
@@ -39,7 +39,9 @@ int main(int argc, char **argv) {
   
   close(socket_id);
 
-  execvp("Engine.c", engine);
+  sleep(2);
+
+  execvp("./execute", engine);
 
   return 0;
 }
