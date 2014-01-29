@@ -1,4 +1,9 @@
 #include "headers.h"
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+
 #define MAX_WTYPES 5
 #define MAX_PART1 5
 #define MAX_PART2 5
@@ -251,7 +256,7 @@ void interpretGame(){
   else if(strcasecmp(input,"Attack\n") == 0){
     battle();
   }
-  else if(strcasecmp(input,"down foreward low punch\n") == 0){
+  else if(strcasecmp(input,"down forward low punch\n") == 0){
     printf("Hadoken \n");
     sleep(1);
     if(DRoom->roomClear)
@@ -276,11 +281,10 @@ void interpretGame(){
   }
     else if(!strcasecmp(input,"OSave\n")){
     dump();
-    char * buff[256];
-    char * sl = "Save\n"
+    char buff[256];
     printf("Enter the ip adress of the save server\n");
-    fgets(buff, sizeof[buff], stdin);
-    OSL(sl, buff);
+    fgets(buff, sizeof(buff), stdin);
+    OSave(2, buff);
   }
   else if(strcasecmp(input,"Inventory\n") == 0){
     if(Player->weaponNum == 0){
@@ -473,12 +477,12 @@ int load(){
   return 0;
 }
 
-int OSL(char * sl, char *ipadress) {
+int OSave(int argz, char *ipadress) {
 
   int socket_id;
   char buffer[256];
   int i, b;
-  
+  strcpy( buffer, "save");
   struct sockaddr_in sock;
 
   //make the server socket for reliable IPv4 traffic 
@@ -489,48 +493,23 @@ int OSL(char * sl, char *ipadress) {
   //set up the server socket struct
   //Use IPv4 
   sock.sin_family = AF_INET;
-
-  //Client will connect to address in argv[1], need to translate that IP address to binary
-  inet_aton( ipadress, &(sock.sin_addr) );
-    
+  
+  //Client will connect to address in ipadress, need to translate that IP address to binary
+  inet_aton( &ipadress, &(sock.sin_addr) );
   //set the port to listen on, htons converts the port number to network format
-  sock.sin_port = htons(24602);
+  sock.sin_port = htons(24607);
   
   //connect to the server
   int c = connect(socket_id, (struct sockaddr *)&sock, sizeof(sock));
   printf("Connect returned: %d\n", c);
-
-    //do client stuff 
-
-  if ( strcmp(sl, "Save\n") == 0){
-    strcpy("save", buffer);
-    write( socket_client, buffer, strlen(buffer));
-    b = read( socket_client, buffer, sizeof(buffer) );
-    if (strcmp(buffer, "send") == 0){
-      int fd = open("savefile.file", O_RDWR | O_CREAT, 0666);
-      read(fd, buffer, sizeof(buffer));
-      write( socket_client, buffer, strlen(buffer));
-    }   
+  write( socket_id, buffer, strlen(buffer));
+  b = read( socket_id, buffer, sizeof(buffer) );
+  printf("%s", buffer);
+  if (strcmp(buffer, "send") == 0){
+    int fd = open("savefile.file", O_RDWR | O_CREAT, 0666);
+    read(fd, buffer, sizeof(buffer));
+    write( socket_id, buffer, strlen(buffer));   
     close(fd);	
-  }
-  else{
-    strcpy("load", buffer);
-
-  }
-
-
-      printf("Enter message: ");
-      fgets(buffer, sizeof(buffer), stdin);
-      *(strchr(buffer, '\n')) = 0;
-
-      b = write( socket_id, buffer, strlen(buffer) + 1 );
-
-      if ( strncmp(buffer, "exit", sizeof(buffer)) == 0)
-	break;
-
-      b = read( socket_id, buffer, strlen(buffer));
-      
-      printf("\tReceived: %s\n", buffer);
     }
 
     close(socket_id);

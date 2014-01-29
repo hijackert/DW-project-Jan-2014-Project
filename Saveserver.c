@@ -32,7 +32,7 @@ int main() {
   server.sin_addr.s_addr = INADDR_ANY;
   
   //set the port to listen on, htons converts the port number to network format DIFFERENT PORT
-  server.sin_port = htons(24602);
+  server.sin_port = htons(24607);
   
   //bind the socket to the socket struct
   i= bind( socket_id, (struct sockaddr *)&server, sizeof(server) );
@@ -48,36 +48,35 @@ int main() {
     //set socket_length after the connection is made
     socket_length = sizeof(server); 
 
+     while (1) {
     //accept the incoming connection, create a new file desciprtor for the socket to the client
     socket_client = accept(socket_id, (struct sockaddr *)&server, &socket_length);
-     while (1) {
 
       //read from the client
       b = read( socket_client, buffer, sizeof(buffer) );
       printf("Received: %s\n", buffer);
-      
-      if ( strncmp(buffer, "exit", sizeof(buffer)) == 0)
-	break;
+      sleep(1);
 
       if ( strncmp(buffer, "save", sizeof(buffer)) == 0){
-	strcpy("send", buffer);
+	strcpy(buffer, "send");
 	write( socket_client, buffer, strlen(buffer));
 	b = read( socket_client, buffer, sizeof(buffer) );
 	int fd = open("savefile.file", O_RDWR | O_CREAT, 0666);
 	write(fd, buffer, sizeof(buffer));
 	close(fd);
+	close(socket_client);
       }
       
-      if ( strncmp(buffer, "load", sizeof(buffer)) == 0){
+      if ( strncmp(buffer, "load\n", sizeof(buffer)) == 0){
 	int fd = open("savefile.file", O_RDWR | O_CREAT, 0666);
 	read(fd, buffer, sizeof(buffer));
 	write( socket_client, buffer, strlen(buffer));
 	close(fd);	
       }
-
+      close(socket_client);
+      printf("Waiting for connection\n");
     }
 
-    close(socket_client);
 
     printf("Waiting for new connection\n");
   }

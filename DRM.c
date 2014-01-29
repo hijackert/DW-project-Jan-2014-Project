@@ -21,18 +21,16 @@ int main(int argc, char **argv) {
   //make the server socket for reliable IPv4 traffic 
   socket_id = socket( AF_INET, SOCK_STREAM, 0);
 
-  // printf("Soket file descriptor: %d\n", socket_id);
+  printf("Soket file descriptor: %d\n", socket_id);
 
   //set up the server socket struct
   //Use IPv4 
   sock.sin_family = AF_INET;
-
   //Client will connect to address in argv[1], need to translate that IP address to binary
   inet_aton( argv[1], &(sock.sin_addr) );
-    
+
   //set the port to listen on, htons converts the port number to network format
   sock.sin_port = htons(24601);
-  
   //connect to the server
   int c = connect(socket_id, (struct sockaddr *)&sock, sizeof(sock));
   printf("Game Copy Verified\n");
