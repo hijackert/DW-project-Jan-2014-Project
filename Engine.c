@@ -56,6 +56,8 @@ int main(){
 	  printf("Test\n");
 	  break;
 	}
+	else 
+	  printf("There is no save file present. Creating new Character\n");
       case 2:
 	Player = (Character *)calloc(1, sizeof(Character));
 	printf("Please enter your Name:\n");
