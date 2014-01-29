@@ -474,11 +474,11 @@ int LoadChooser(){
   if (strcasecmp("Yes\n", onlineconfirm) == 0){
     OLoad();
     return 0;
-    }
-  else{
-    load();
   }
-  return 0;
+  else{
+    return load();
+  }
+  // return 0;
 }
 
 
