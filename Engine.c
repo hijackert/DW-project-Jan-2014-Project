@@ -1,5 +1,4 @@
 #include "headers.h"
-#include <ncurses.h>
 #define MAX_WTYPES 5
 #define MAX_PART1 5
 #define MAX_PART2 5
