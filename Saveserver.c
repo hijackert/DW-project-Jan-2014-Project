@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include "headers.h"
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -30,8 +31,8 @@ int main() {
   //This is the server, so it will listen to anything coming into the host computer
   server.sin_addr.s_addr = INADDR_ANY;
   
-  //set the port to listen on, htons converts the port number to network format
-  server.sin_port = htons(24601);
+  //set the port to listen on, htons converts the port number to network format DIFFERENT PORT
+  server.sin_port = htons(24602);
   
   //bind the socket to the socket struct
   i= bind( socket_id, (struct sockaddr *)&server, sizeof(server) );
@@ -49,8 +50,32 @@ int main() {
 
     //accept the incoming connection, create a new file desciprtor for the socket to the client
     socket_client = accept(socket_id, (struct sockaddr *)&server, &socket_length);
-    printf("Verified Game %d\n",socket_client);
- 
+     while (1) {
+
+      //read from the client
+      b = read( socket_client, buffer, sizeof(buffer) );
+      printf("Received: %s\n", buffer);
+      
+      if ( strncmp(buffer, "exit", sizeof(buffer)) == 0)
+	break;
+
+      if ( strncmp(buffer, "save", sizeof(buffer)) == 0){
+	strcpy("send", buffer);
+	b = read( socket_client, buffer, sizeof(buffer) );
+	int fd = open("savefile.file", O_RDWR | O_CREAT, 0666);
+	write(fd, buffer, sizeof(buffer));
+	close(fd);
+      }
+      
+      if ( strncmp(buffer, "load", sizeof(buffer)) == 0){
+	int fd = open("savefile.file", O_RDWR | O_CREAT, 0666);
+	read(fd, buffer, sizeof(buffer));
+	write( socket_client, buffer, strlen(buffer));
+	close(fd);	
+      }
+
+    }
+
     close(socket_client);
 
     printf("Waiting for new connection\n");
