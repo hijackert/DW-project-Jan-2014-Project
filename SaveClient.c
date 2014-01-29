@@ -30,16 +30,16 @@ int main(int argc, char **argv) {
   inet_aton( argv[1], &(sock.sin_addr) );
     
   //set the port to listen on, htons converts the port number to network format
-  sock.sin_port = htons(24601);
+  sock.sin_port = htons(24602);
   
   //connect to the server
   int c = connect(socket_id, (struct sockaddr *)&sock, sizeof(sock));
   printf("Connect returned: %d\n", c);
 
     //do client stuff continuously
-    while (1) {
 
-      
+  
+
       printf("Enter message: ");
       fgets(buffer, sizeof(buffer), stdin);
       *(strchr(buffer, '\n')) = 0;
@@ -57,4 +57,16 @@ int main(int argc, char **argv) {
     close(socket_id);
 
     return 0;
+}
+int load(){
+  int fd = open("savefile.file", O_RDWR);
+  if(fd == -1)
+    return -1;
+  Player = (Character *) calloc(1, sizeof(Character));
+  read(fd, Player, sizeof(Character));
+  DRoom = (Room *) calloc(1, sizeof(Room));
+  read(fd, DRoom, sizeof(Room));
+  Enemy = &(DRoom -> Enemy);
+  close(fd);
+  return 0;
 }

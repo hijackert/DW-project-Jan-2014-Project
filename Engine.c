@@ -275,6 +275,14 @@ void interpretGame(){
     dump();
     printf("Game saved\n");
   }
+    else if(!strcasecmp(input,"OSave\n")){
+    dump();
+    char * buff[256];
+    char * sl = "Save\n"
+    printf("Enter the ip adress of the save server\n");
+    fgets(buff, sizeof[buff], stdin);
+    OSL(sl, buff);
+  }
   else if(strcasecmp(input,"Inventory\n") == 0){
     if(Player->weaponNum == 0){
 	printf("You have no weapons!\n");
@@ -464,4 +472,69 @@ int load(){
   Enemy = &(DRoom -> Enemy);
   close(fd);
   return 0;
+}
+
+int OSL(char * sl, char *ipadress) {
+
+  int socket_id;
+  char buffer[256];
+  int i, b;
+  
+  struct sockaddr_in sock;
+
+  //make the server socket for reliable IPv4 traffic 
+  socket_id = socket( AF_INET, SOCK_STREAM, 0);
+
+  printf("Soket file descriptor: %d\n", socket_id);
+
+  //set up the server socket struct
+  //Use IPv4 
+  sock.sin_family = AF_INET;
+
+  //Client will connect to address in argv[1], need to translate that IP address to binary
+  inet_aton( ipadress, &(sock.sin_addr) );
+    
+  //set the port to listen on, htons converts the port number to network format
+  sock.sin_port = htons(24602);
+  
+  //connect to the server
+  int c = connect(socket_id, (struct sockaddr *)&sock, sizeof(sock));
+  printf("Connect returned: %d\n", c);
+
+    //do client stuff 
+
+  if ( strcmp(sl, "Save\n") == 0){
+    strcpy("save", buffer);
+    write( socket_client, buffer, strlen(buffer));
+    b = read( socket_client, buffer, sizeof(buffer) );
+    if (strcmp(buffer, "send") == 0){
+      int fd = open("savefile.file", O_RDWR | O_CREAT, 0666);
+      read(fd, buffer, sizeof(buffer));
+      write( socket_client, buffer, strlen(buffer));
+    }   
+    close(fd);	
+  }
+  else{
+    strcpy("load", buffer);
+
+  }
+
+
+      printf("Enter message: ");
+      fgets(buffer, sizeof(buffer), stdin);
+      *(strchr(buffer, '\n')) = 0;
+
+      b = write( socket_id, buffer, strlen(buffer) + 1 );
+
+      if ( strncmp(buffer, "exit", sizeof(buffer)) == 0)
+	break;
+
+      b = read( socket_id, buffer, strlen(buffer));
+      
+      printf("\tReceived: %s\n", buffer);
+    }
+
+    close(socket_id);
+
+    return 0;
 }

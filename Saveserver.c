@@ -61,6 +61,7 @@ int main() {
 
       if ( strncmp(buffer, "save", sizeof(buffer)) == 0){
 	strcpy("send", buffer);
+	write( socket_client, buffer, strlen(buffer));
 	b = read( socket_client, buffer, sizeof(buffer) );
 	int fd = open("savefile.file", O_RDWR | O_CREAT, 0666);
 	write(fd, buffer, sizeof(buffer));
