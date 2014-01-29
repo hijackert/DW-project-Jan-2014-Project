@@ -52,7 +52,7 @@ int main(){
 	bob = 1;
       switch(bob){
       case 1:
-	if(!load()){
+	if(!LoadChooser()){
 	  printf("Test\n");
 	  break;
 	}
@@ -224,7 +224,7 @@ void printStats(){
 }
 
 void DisplayHelp(){
-  printf("\nCOMMANDS AND FUNCTIONS\nStats - Displays your Attack, Defense, Speed, Current XP,\n\t XP until next level, and Health\nRoom - Current Room information\nInventory - Display your current Inventory\nHelp - Displays the Help\nAttack - Attacks the monster if there is one in the room\nAdvance: Moves you to the next room if it is possible\nSave - save the game (note: you may only have one save file)\n");
+  printf("\nCOMMANDS AND FUNCTIONS\nStats - Displays your Attack, Defense, Speed, Current XP,\n\t XP until next level, and Health\nRoom - Current Room information\nInventory - Display your current Inventory\nHelp - Displays the Help\nAttack - Attacks the monster if there is one in the room\nAdvance- Moves you to the next room if it is possible\nSave - save the game (note: you may only have one save file)\nOSave - Saves to an online server (You MUST have the server running and correct ip address to do this)\n ");
   printf("\n Press enter to continue \n");
   getchar();
 }
@@ -466,6 +466,22 @@ void dump(){
   write(fd, DRoom, sizeof(Room));
   close(fd);
 }
+
+int LoadChooser(){
+  char onlineconfirm[256];
+  printf("Would you like to load an online save? You must have already saved to the server from which you are loading!\n");
+  fgets(onlineconfirm, sizeof(onlineconfirm), stdin);
+  if (strcasecmp("Yes\n", onlineconfirm) == 0){
+    OLoad();
+    return 0;
+    }
+  else{
+    load();
+  }
+  return 0;
+}
+
+
 int load(){
   int fd = open("savefile.file", O_RDWR);
   if(fd == -1)
@@ -484,7 +500,7 @@ int OSave(int argz, char *ipadress) {
   int socket_id;
   char buffer[256];
   int i, b;
-  strcpy( buffer, "save");
+  strcpy( buffer, "save\n");
   struct sockaddr_in sock;
 
   //make the server socket for reliable IPv4 traffic 
@@ -517,4 +533,41 @@ int OSave(int argz, char *ipadress) {
     close(socket_id);
 
     return 0;
+}
+
+int OLoad(int argz, char *ipadress) {
+
+  int socket_id;
+  char buffer[256];
+  int i, b;
+  strcpy( buffer, "load\n");
+  struct sockaddr_in sock;
+
+  //make the server socket for reliable IPv4 traffic 
+  socket_id = socket( AF_INET, SOCK_STREAM, 0);
+
+  printf("Soket file descriptor: %d\n", socket_id);
+
+  //set up the server socket struct
+  //Use IPv4 
+  sock.sin_family = AF_INET;
+  
+  //Client will connect to address in ipadress, need to translate that IP address to binary
+  inet_aton( &ipadress, &(sock.sin_addr) );
+  //set the port to listen on, htons converts the port number to network format
+  sock.sin_port = htons(24607);
+  
+  //connect to the server
+  int c = connect(socket_id, (struct sockaddr *)&sock, sizeof(sock));
+  printf("Connect returned: %d\n", c);
+  write( socket_id, buffer, strlen(buffer));
+  b = read( socket_id, buffer, strlen(buffer) );
+  int fd = open("savefile.file", O_RDWR | O_CREAT, 0666);
+  write(fd, buffer, sizeof(buffer));   
+  close(fd);	
+
+  close(socket_id);
+  
+  load();
+  return 0;
 }

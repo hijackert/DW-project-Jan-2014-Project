@@ -67,11 +67,12 @@ int main() {
 	close(socket_client);
       }
       
-      if ( strncmp(buffer, "load\n", sizeof(buffer)) == 0){
-	int fd = open("savefile.file", O_RDWR | O_CREAT, 0666);
-	read(fd, buffer, sizeof(buffer));
-	write( socket_client, buffer, strlen(buffer));
-	close(fd);	
+      if ( strncmp(buffer, "load", sizeof(buffer)) == 0){
+	  int fd = open("savefile.file", O_RDWR | O_CREAT, 0666);
+	  read(fd, buffer, sizeof(buffer));
+	  buffer[255] = "";
+	  write( socket_id, buffer, strlen(buffer));   
+	  close(fd);	
       }
       close(socket_client);
       printf("Waiting for connection\n");
