@@ -86,6 +86,7 @@ int main(){
 	generateRoom();
       }
       while(Player->hp > 0 && quit){
+	signal(SIGINT, sigHandle);
 	system("clear");
 	printf("Your life: %d \n", Player->hp);
 	if(!DRoom->roomClear)
@@ -137,6 +138,13 @@ int rand_lim(int limit) {
   return (int)((double)limit * ( rand()/(double)RAND_MAX));
 }
 
+void sigHandle(int sig){
+  if(sig == SIGINT){
+    dump();
+    int temp = getpid();
+    kill(temp,SIGQUIT);
+  }
+}
 //Generation-----------------------------------------------------------------------------------------Generation
 
 void generatePlayer(){
